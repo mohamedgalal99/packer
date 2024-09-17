@@ -1,0 +1,8 @@
+[Unit]
+Description=T-Rex Miner Service
+
+[Service]
+ExecStart=/opt/start-mining.sh
+
+[Install]
+WantedBy=multi-user.target
