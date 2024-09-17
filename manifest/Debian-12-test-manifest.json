@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "name": "debian-12",
+      "builder_type": "openstack",
+      "build_time": 1726495916,
+      "files": null,
+      "artifact_id": "2f30d613-31cc-427c-a062-584dcac2464c",
+      "packer_run_uuid": "d7e7169b-6d05-a0da-4d1f-3eeffa388df8",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "d7e7169b-6d05-a0da-4d1f-3eeffa388df8"
+}

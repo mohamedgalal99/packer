@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "name": "almalinux-8-9",
+      "builder_type": "openstack",
+      "build_time": 1726573617,
+      "files": null,
+      "artifact_id": "ffbaa3e1-3389-47c3-b8e9-b56d30a435d5",
+      "packer_run_uuid": "306afb0a-6a1a-ad1f-43f6-800b4c0ff3e1",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "306afb0a-6a1a-ad1f-43f6-800b4c0ff3e1"
+}

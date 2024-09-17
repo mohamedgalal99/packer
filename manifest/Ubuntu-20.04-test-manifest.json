@@ -1,0 +1,41 @@
+{
+  "builds": [
+    {
+      "name": "ubuntu-2004",
+      "builder_type": "openstack",
+      "build_time": 1724297656,
+      "files": null,
+      "artifact_id": "b0d39c29-f516-430d-83cd-510b84447fbe",
+      "packer_run_uuid": "55993309-3a43-d46a-0cbe-5d0faccab842",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu-2004",
+      "builder_type": "openstack",
+      "build_time": 1726230323,
+      "files": null,
+      "artifact_id": "f89ebaac-172c-4f9f-9606-26b3fa2dd307",
+      "packer_run_uuid": "09162e70-843c-9370-f998-2c9c69959792",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu-2004",
+      "builder_type": "openstack",
+      "build_time": 1726231149,
+      "files": null,
+      "artifact_id": "56ba5207-b54d-47dd-9881-79f2207f0fcb",
+      "packer_run_uuid": "983be829-93b9-51af-fe89-51d7d13cfd39",
+      "custom_data": null
+    },
+    {
+      "name": "ubuntu-2004",
+      "builder_type": "openstack",
+      "build_time": 1726233658,
+      "files": null,
+      "artifact_id": "08238db5-7960-4b13-bed6-5bf7bd43bb0c",
+      "packer_run_uuid": "d2e0169c-96de-4417-8962-d4f6a73f1d3f",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "d2e0169c-96de-4417-8962-d4f6a73f1d3f"
+}

@@ -1,0 +1,49 @@
+{
+  "variables": {
+    "os_access_key": "xxxx",
+    "os_secret_key": "xxxx",
+    "os_pub_net": "ee54f79e-d33a-4866-8df0-4a4576d70243",
+    "os_project": "leaf-test",
+    "os_flavor": "ec1.small"
+  },
+  "builders": [
+    {
+      "type": "openstack",
+      "identity_endpoint": "https://create.leaf.cloud:5000",
+      "user": "xxxxxxxxxxxxxxxxxxxxx",
+      "password": "xxxxxxxxxxxxxxxx",
+      "tenant_name": "{{user `os_project`}}",
+      "domain_name": "Default",
+      "region": "europe-nl",
+      "ssh_username": "cloud-user",
+      "image_name": "Ubuntu-20.04-test",
+      "networks": [
+        "{{user `os_pub_net`}}"
+      ],
+      "image_visibility": "private",
+      "source_image_filter": {
+        "filters": {
+          "name": "Ubuntu-20.04",
+          "visibility": "public",
+          "owner": "55f00f9b08674977a8d66a527030f883",
+          "properties": {
+            "os_distro": "ubuntu",
+            "os_version": "20.04"
+          }
+        },
+        "most_recent": true
+      },
+      "flavor": "{{user `os_flavor`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt update && sudo apt upgrade -y",
+        "sudo apt install tree -y"
+      ]
+    }
+  ]
+}
+

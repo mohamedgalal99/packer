@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    image: ""
+  tasks:
+    - name: update repo
+      command: "apt update"
+      when: ansible_os_family == "Debian" or ansible_os_family == "Ubuntu"
+
+    - name: upgrade packages
+      package:
+        name: "*"
+        state: latest
+
+    - name: "Remove {{ image }}-manifest.json"
+      file:
+        path: "manifest/{{ image }}-manifest.json"
+        state: absent
+      delegate_to: localhost

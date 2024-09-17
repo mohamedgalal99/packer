@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "name": "centos-stream-9",
+      "builder_type": "openstack",
+      "build_time": 1726566288,
+      "files": null,
+      "artifact_id": "e20512dd-b9a3-4a5f-9e5f-53c673143fc3",
+      "packer_run_uuid": "78b150b9-53dd-494c-dfc3-50ffb1d40e5e",
+      "custom_data": null
+    }
+  ],
+  "last_run_uuid": "78b150b9-53dd-494c-dfc3-50ffb1d40e5e"
+}
