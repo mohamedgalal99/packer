@@ -7,37 +7,37 @@
 #  }
 #}
 
-variable "os_access_key" {
-  description = "Access key for OpenStack"
-}
-
-variable "os_secret_key" {
-  description = "Secret key for OpenStack"
-}
-
-variable "os_pub_net" {
-  description = "Public network ID"
-}
-
-variable "os_project" {
-  description = "Project in OpenStack"
-}
-
-variable "os_flavor" {
-  description = "Instance Flavor"
-}
-
-variable "os_username" {
-  description = "Openstack login Username"
-}
-
-variable "os_password" {
-  description = "Openstack Password"
-}
-
-variable "os_identity_endpoint" {
-  description = "Identity endpoint for OpenStack"
-}
+#variable "os_access_key" {
+#  description = "Access key for OpenStack"
+#}
+#
+#variable "os_secret_key" {
+#  description = "Secret key for OpenStack"
+#}
+#
+#variable "os_pub_net" {
+#  description = "Public network ID"
+#}
+#
+#variable "os_project" {
+#  description = "Project in OpenStack"
+#}
+#
+#variable "os_flavor" {
+#  description = "Instance Flavor"
+#}
+#
+#variable "os_username" {
+#  description = "Openstack login Username"
+#}
+#
+#variable "os_password" {
+#  description = "Openstack Password"
+#}
+#
+#variable "os_identity_endpoint" {
+#  description = "Identity endpoint for OpenStack"
+#}
 
 locals {
   org_img_name_rocky93 = "Rocky-9.3"
