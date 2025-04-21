@@ -32,24 +32,24 @@
 #}
 
 locals {
-  org_img_name_almalinux93 = "AlmaLinux-9.3"
-  new_img_name_almalinux93 = "AlmaLinux-9.3-test"
-  ssh_username_almalinux93 = "almalinux"
+  org_img_name_centos8 = "CentOS-Stream-8"
+  new_img_name_centos8 = "CentOS-Stream-8-test"
+  ssh_username_centos8 = "centos"
 }
 
 
-source "openstack" "almalinux-9-3" {
+source "openstack" "centos-stream-8" {
   identity_endpoint               = var.os_identity_endpoint
   username                        = var.os_username
   password                        = var.os_password
   tenant_name                     = var.os_project
   domain_name                     = "Default"
   region                          = "europe-nl"
-  ssh_username                    = local.ssh_username_almalinux93
-  image_name                      = local.new_img_name_almalinux93
+  ssh_username                    = local.ssh_username_centos8
+  image_name                      = local.new_img_name_centos8
   external_source_image_format    = "qcow2"
   networks                        = [var.os_pub_net]
-  image_visibility                = "private"
+  image_visibility                = var.image_visability
   image_disk_format               = "qcow2"
   volume_type                     = "unencrypted"
   config_drive                    = true
@@ -61,7 +61,7 @@ source "openstack" "almalinux-9-3" {
 
   source_image_filter {
     filters {
-      name        = local.org_img_name_almalinux93
+      name        = local.org_img_name_centos8
       visibility  = "public"
       owner       = "55f00f9b08674977a8d66a527030f883"
     }
@@ -72,12 +72,12 @@ source "openstack" "almalinux-9-3" {
 # need to be changed, will see how to group all in one build
 build {
   sources = [
-    "source.openstack.almalinux-9-3"
+    "source.openstack.centos-stream-8"
   ]
 
+  # This is for Centos 8 stream only
   provisioner "shell" {
-    script = "scripts/dnf-update.sh"
-    expect_disconnect = true
+    script = "scripts/centos-strem-8-repo.sh"
   }
 
   provisioner "breakpoint" {
@@ -86,7 +86,7 @@ build {
   }
 
   post-processor "manifest" {
-    output     = "manifest/${local.new_img_name_almalinux93}-manifest.json"
+    output     = "manifest/${local.new_img_name_centos8}-manifest.json"
     strip_path = true
   }
 
@@ -94,7 +94,7 @@ build {
     environment_vars = [
       "OS_USERNAME=${var.os_username}",
       "OS_PASSWORD=${var.os_password}",
-      "IMAGE_NAME=${local.new_img_name_almalinux93}"
+      "IMAGE_NAME=${local.new_img_name_centos8}"
     ]
     scripts = [
       "./scripts/image_modify.sh"

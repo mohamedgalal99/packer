@@ -1,0 +1,4 @@
+ssh-key/shared_leafcloud_key
+variables.pkrvars.hcl
+manifest/*
+lazygit*

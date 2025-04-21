@@ -32,24 +32,24 @@
 #}
 
 locals {
-  org_img_name_centos9 = "CentOS-Stream-9"
-  new_img_name_centos9 = "CentOS-Stream-9-test"
-  ssh_username_centos9 = "cloud-user"
+  org_img_name_debian11 = "Debian-11"
+  new_img_name_debian11 = "Debian-11-test"
+  ssh_username_debian11 = "debian"
 }
 
 
-source "openstack" "centos-stream-9" {
+source "openstack" "debian-11" {
   identity_endpoint               = var.os_identity_endpoint
   username                        = var.os_username
   password                        = var.os_password
   tenant_name                     = var.os_project
   domain_name                     = "Default"
   region                          = "europe-nl"
-  ssh_username                    = local.ssh_username_centos9
-  image_name                      = local.new_img_name_centos9
+  ssh_username                    = local.ssh_username_debian11
+  image_name                      = local.new_img_name_debian11
   external_source_image_format    = "qcow2"
   networks                        = [var.os_pub_net]
-  image_visibility                = "private"
+  image_visibility                = var.image_visability
   image_disk_format               = "qcow2"
   volume_type                     = "unencrypted"
   config_drive                    = true
@@ -61,7 +61,7 @@ source "openstack" "centos-stream-9" {
 
   source_image_filter {
     filters {
-      name        = local.org_img_name_centos9
+      name        = local.org_img_name_debian11
       visibility  = "public"
       owner       = "55f00f9b08674977a8d66a527030f883"
     }
@@ -72,21 +72,27 @@ source "openstack" "centos-stream-9" {
 # need to be changed, will see how to group all in one build
 build {
   sources = [
-    "source.openstack.centos-stream-9"
+    "source.openstack.debian-11"
   ]
 
   provisioner "shell" {
-    script = "scripts/yum-update.sh"
+    script = "scripts/update-ubuntu.sh"
     expect_disconnect = true
   }
 
   provisioner "breakpoint" {
-    disable  = true
-    note     = "Confirm job is done"
+    disable  = false
+    note     = "1st job done"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo apt-get upgrade -y"
+    ]
   }
 
   post-processor "manifest" {
-    output     = "manifest/${local.new_img_name_centos9}-manifest.json"
+    output     = "manifest/${local.new_img_name_debian11}-manifest.json"
     strip_path = true
   }
 
@@ -94,12 +100,11 @@ build {
     environment_vars = [
       "OS_USERNAME=${var.os_username}",
       "OS_PASSWORD=${var.os_password}",
-      "IMAGE_NAME=${local.new_img_name_centos9}"
+      "IMAGE_NAME=${local.new_img_name_debian11}"
     ]
     scripts = [
       "./scripts/image_modify.sh"
     ]
   }
-
 }
 

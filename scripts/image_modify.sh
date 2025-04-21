@@ -13,15 +13,15 @@ export OS_IDENTITY_API_VERSION=3
 
 file_name="manifest/${IMAGE_NAME}-manifest.json"
 
-for img_id in $(jq '.builds[].artifact_id' ${file_name} | sed 's/"//g')
+for img_id in $(jq '.builds[].artifact_id' ${file_name} | sed 's/"//g' | tail -1)
 do
-    echo "${img_id}"
+    echo "New Image ID: ${img_id}"
     openstack image unset --property signature_verified "${img_id}"
     sleep 5
     img_name="$(openstack image show ${img_id} -f value -c name)"
 
     echo "$img_name"
-    for old_img in $(openstack image list --private -f value | grep "\ ${img_name}\ " | grep -v "${img_id}" | awk '{print $1}')
+    for old_img in $(openstack image list --public -f value | grep "\ ${img_name}\ " | grep -v "${img_id}" | awk '{print $1}')
     do
       echo "$old_img"
       openstack image set --name "${img_name}.$(date +%Y%m%d)" "${old_img}"

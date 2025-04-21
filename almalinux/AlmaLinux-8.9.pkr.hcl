@@ -49,7 +49,7 @@ source "openstack" "almalinux-8-9" {
   image_name                      = local.new_img_name_almalinux89
   external_source_image_format    = "qcow2"
   networks                        = [var.os_pub_net]
-  image_visibility                = "private"
+  image_visibility                = var.image_visability
   image_disk_format               = "qcow2"
   volume_type                     = "unencrypted"
   config_drive                    = true
