@@ -1,0 +1,172 @@
+---
+- name: Ubuntu 22.04 Hardening with Ubuntu Pro and USG
+  hosts: all
+  become: true
+  vars:
+    pro_token: "***"
+
+  tasks:
+    - name: Ensure system is fully updated
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Add ua-airgapped PPA repository
+      apt_repository:
+        repo: ppa:yellow/ua-airgapped
+        state: present
+
+    - name: Update APT package cache after adding PPA
+      apt:
+        update_cache: yes
+
+    - name: Install ua-airgapped and related packages
+      apt:
+        name:
+          #- ua-airgapped
+          - contracts-airgapped
+          - get-resource-tokens
+          - pro-airgapped
+        state: present
+
+    - name: Validate pro-airgapped output shows apt URLs
+      shell: echo "{{ pro_token }}:" | pro-airgapped | grep 'aptURL:'
+      register: pro_airgapped_output
+      changed_when: false
+      failed_when: pro_airgapped_output.stdout_lines | length == 0
+
+    - name: Show pro-airgapped aptURL list
+      debug:
+        var: pro_airgapped_output.stdout_lines
+
+    - name: Attach Ubuntu Pro subscription
+      command: pro attach {{ pro_token }}
+      register: pro_attach_result
+      changed_when: "'already attached' not in pro_attach_result.stdout"
+
+    - name: Show Ubuntu Pro attach result
+      debug:
+        var: pro_attach_result.stdout
+
+    - name: Reboot after Ubuntu Pro attach
+      reboot:
+        reboot_timeout: 600
+        test_command: whoami
+
+    - name: Enable Ubuntu Security Guide (USG)
+      command: pro enable usg
+      register: usg_enable_result
+      changed_when: "'already enabled' not in usg_enable_result.stdout"
+
+    - name: Show USG enable result
+      debug:
+        var: usg_enable_result.stdout
+
+    - name: Reboot after enabling USG
+      reboot:
+        reboot_timeout: 600
+        test_command: whoami
+
+    - name: Install usg package
+      apt:
+        name: usg
+        state: present
+
+    - name: Final APT package cache update
+      apt:
+        update_cache: yes
+
+    - name: Final APT full upgrade
+      apt:
+        upgrade: dist
+
+    - name: Generate USG tailoring file for CIS Level 1 Server
+      command: usg generate-tailoring cis_level1_server /root/tailor.xml
+      args:
+        creates: /root/tailor.xml
+
+    - name: Disable wireless interface check in tailor.xml
+      replace:
+        path: /root/tailor.xml
+        regexp: '(<select idref="xccdf_org.ssgproject.content_rule_wireless_disable_interfaces" selected=")true("/>)'
+        replace: '\1false\2'
+
+    - name: Disable UFW package removal check in tailor.xml
+      replace:
+        path: /root/tailor.xml
+        regexp: '(<select idref="xccdf_org.ssgproject.content_rule_package_ufw_removed" selected=")true("/>)'
+        replace: '\1false\2'
+
+    - name: Generate CIS fix script using USG
+      command: usg generate-fix --output /root/cis-fix.sh --tailoring-file /root/tailor.xml
+      args:
+        creates: /root/cis-fix.sh
+
+    - name: Fix nftables bug in cis-fix.sh to avoid breaking DNS
+      replace:
+        path: /root/cis-fix.sh
+        regexp: 'nft insert rule inet filter input ip saddr 127\\.0\\.0\\.0/8 counter drop'
+        replace: 'nft add rule inet filter input ip saddr 127.0.0.0/8 counter drop'
+
+    - name: Apply CIS hardening script
+      command: bash /root/cis-fix.sh
+      args:
+        creates: /root/.cis_hardening_applied
+      register: cis_fix_result
+
+    - name: Mark CIS hardening as applied
+      file:
+        path: /root/.cis_hardening_applied
+        state: touch
+
+    - name: Show CIS hardening result
+      debug:
+        var: cis_fix_result.stdout
+
+    - name: Final reboot after applying CIS hardening
+      reboot:
+        reboot_timeout: 600
+        test_command: whoami
+
+    - name: Generate USG audit report (HTML)
+      command: usg audit --tailoring-file /root/tailor.xml --html-file /root/result.html
+      args:
+        creates: /root/result.html
+      register: usg_audit_result
+
+    - name: Show USG audit summary (stdout)
+      debug:
+        var: usg_audit_result.stdout
+
+    - name: Fetch USG audit report to local machine
+      fetch:
+        src: /root/result.html
+        dest: ./reports/
+        flat: yes
+
+    - name: Ensure ca-certificates package is installed
+      apt:
+        name: ca-certificates
+        state: present
+
+    - name: Upload custom CA certificate to remote host
+      copy:
+        src: ./certs/my-root-ca.crt
+        dest: /usr/local/share/ca-certificates/my-root-ca.crt
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Update CA certificates
+      command: update-ca-certificates
+      register: ca_update_result
+      changed_when: "'added' in ca_update_result.stdout"
+
+    - name: Show CA update output
+      debug:
+        var: ca_update_result.stdout
+
+    - name: Disable AIDE daily cron job by removing execute permission
+      file:
+        path: /etc/cron.daily/aide
+        mode: '0644'
