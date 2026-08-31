@@ -11,16 +11,16 @@ fi
 # shellcheck disable=SC1091
 . /etc/os-release
 
-if [ "${ID:-}" != "ubuntu" ]; then
-  echo "Error: update-ubuntu.sh can only run on Ubuntu (detected: ${ID:-unknown})"
+if [ "${ID:-}" != "debian" ]; then
+  echo "Error: update-debian.sh can only run on Debian (detected: ${ID:-unknown})"
   exit 1
 fi
 
 case "${VERSION_ID:-}" in
-  20.04|22.04|24.04)
+  11|12)
     ;;
   *)
-    echo "Error: Unsupported Ubuntu version: ${VERSION_ID:-unknown}"
+    echo "Error: Unsupported Debian version: ${VERSION_ID:-unknown}"
     exit 1
     ;;
 esac
@@ -48,17 +48,10 @@ done
 
 sudo apt-get clean
 sudo -E apt-get update "${apt_options[@]}"
-sudo -E apt-get install -y "${apt_options[@]}" qemu-guest-agent
 
-# Track the latest supported HWE kernel for this Ubuntu LTS release.
-kernel_package="linux-virtual-hwe-${VERSION_ID}"
-sudo -E apt-get install -y --install-recommends "${apt_options[@]}" "${kernel_package}"
-
-if [ "${VERSION_ID}" = "22.04" ]; then
-  sudo -E apt-get install -y --allow-downgrades "${apt_options[@]}" \
-    containerd=1.7.24-0ubuntu1~22.04.2
-  sudo apt-mark hold containerd
-fi
+# Keep the guest tools and Debian cloud-kernel meta-package current.
+kernel_package="linux-image-cloud-$(dpkg --print-architecture)"
+sudo -E apt-get install -y "${apt_options[@]}" qemu-guest-agent "${kernel_package}"
 
 sudo -E apt-get dist-upgrade -y "${apt_options[@]}" "${dpkg_options[@]}"
 sudo -E apt-get autoremove --purge -y "${apt_options[@]}"
